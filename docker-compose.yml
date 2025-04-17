@@ -1,0 +1,46 @@
+# docker-compose.yml
+version: '3.8' # Sử dụng phiên bản phù hợp
+
+services:
+  # Dịch vụ Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2 # Sử dụng phiên bản Elasticsearch bạn muốn
+    container_name: elasticsearch_log
+    environment:
+      - discovery.type=single-node # Chạy dưới dạng một node duy nhất
+      - xpack.security.enabled=false # Tắt bảo mật cho môi trường dev (KHÔNG NÊN dùng cho production)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Cấu hình bộ nhớ JVM (điều chỉnh nếu cần)
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200" # Port cho API
+      - "9300:9300" # Port cho giao tiếp giữa các node (không cần thiết cho single-node)
+    volumes:
+      - esdata:/usr/share/elasticsearch/data # Lưu trữ dữ liệu Elasticsearch
+    networks:
+      - elastic_network # Kết nối vào mạng chung
+
+  # Dịch vụ Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.2 # Phải cùng phiên bản lớn với Elasticsearch
+    container_name: kibana_log
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200 # Địa chỉ Elasticsearch service trong cùng network
+    ports:
+      - "5601:5601" # Port cho giao diện web Kibana
+    depends_on:
+      - elasticsearch # Khởi động sau khi Elasticsearch sẵn sàng
+    networks:
+      - elastic_network # Kết nối vào mạng chung
+
+volumes:
+  esdata: # Volume để lưu dữ liệu Elasticsearch
+
+networks:
+  elastic_network: # Mạng ảo để các container giao tiếp
+    driver: bridge
