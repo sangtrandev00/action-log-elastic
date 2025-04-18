@@ -9,7 +9,9 @@ import { ActionLogService } from './action-log.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ActionLog]), // Đăng ký ActionLog entity với TypeORM
-    ElasticsearchModule, // Đảm bảo ElasticsearchModule đã được import ở AppModule (hoặc import lại ở đây nếu cần cấu hình riêng)
+    ElasticsearchModule.register({
+      nodes: ['http://localhost:9200'],
+    }), // Đảm bảo ElasticsearchModule đã được import ở AppModule (hoặc import lại ở đây nếu cần cấu hình riêng)
   ],
   controllers: [ActionLogController], // Thêm controller
   providers: [ActionLogService], // Thêm service

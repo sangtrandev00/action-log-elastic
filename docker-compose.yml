@@ -1,46 +1,45 @@
 # docker-compose.yml
-version: '3.8' # Sử dụng phiên bản phù hợp
+version: '3.8'
 
 services:
-  # Dịch vụ Elasticsearch
+  # Elasticsearch Service
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2 # Sử dụng phiên bản Elasticsearch bạn muốn
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
     container_name: elasticsearch_log
     environment:
-      - discovery.type=single-node # Chạy dưới dạng một node duy nhất
-      - xpack.security.enabled=false # Tắt bảo mật cho môi trường dev (KHÔNG NÊN dùng cho production)
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Cấu hình bộ nhớ JVM (điều chỉnh nếu cần)
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
         hard: -1
     ports:
-      - "9200:9200" # Port cho API
-      - "9300:9300" # Port cho giao tiếp giữa các node (không cần thiết cho single-node)
+      - "9200:9200"
+      - "9300:9300"
     volumes:
-      - esdata:/usr/share/elasticsearch/data # Lưu trữ dữ liệu Elasticsearch
+      - esdata:/usr/share/elasticsearch/data
     networks:
-      - elastic_network # Kết nối vào mạng chung
+      - elastic_network
 
-  # Dịch vụ Kibana
+  # Kibana Service
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.2 # Phải cùng phiên bản lớn với Elasticsearch
+    image: docker.elastic.co/kibana/kibana:8.13.2
     container_name: kibana_log
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200 # Địa chỉ Elasticsearch service trong cùng network
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
-      - "5601:5601" # Port cho giao diện web Kibana
+      - "5601:5601"
     depends_on:
-      - elasticsearch # Khởi động sau khi Elasticsearch sẵn sàng
+      - elasticsearch
     networks:
-      - elastic_network # Kết nối vào mạng chung
+      - elastic_network
 
 volumes:
-  esdata: # Volume để lưu dữ liệu Elasticsearch
+  esdata:
 
 networks:
-  elastic_network: # Mạng ảo để các container giao tiếp
+  elastic_network:
     driver: bridge

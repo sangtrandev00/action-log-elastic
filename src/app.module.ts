@@ -32,10 +32,19 @@ import { ActionLog } from './action-log/entities/action-log.entity'; // Import E
         // logging: true, // Bật log SQL query (hữu ích khi debug)
       }),
     }),
-
-    // 3. Updated Elasticsearch Module Configuration
+    // 3. Elasticsearch Module Configuration
+    // 3. Elasticsearch Module Configuration
+    // ElasticsearchModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     node: configService.get<string>('ELASTICSEARCH_NODE'),
+    //     maxRetries: 10,
+    //     requestTimeout: 60000,
+    //   }),
+    // }),
     ElasticsearchModule.register({
-      node: 'http://localhost:9200',
+      nodes: ['http://localhost:9200'],
     }),
 
     // 4. Import Module ActionLog

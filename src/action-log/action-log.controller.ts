@@ -8,6 +8,8 @@ import {
   ValidationPipe,
   UsePipes,
   Ip,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { ActionLogService } from './action-log.service';
 import { CreateActionLogDto } from './dto/create-action-log.dto';
@@ -39,11 +41,26 @@ export class ActionLogController {
   }
 
   // Ví dụ endpoint để test tìm kiếm (nếu bạn đã implement hàm search trong service)
-  // @Get('search')
-  // async search(@Query('q') query: string): Promise<any> {
-  //   if (!query) {
-  //     return { message: 'Please provide a search query using ?q=' };
-  //   }
-  //   return this.actionLogService.searchLogs(query);
-  // }
+  @Get('search')
+  async search(@Query('q') query: string): Promise<any> {
+    if (!query) {
+      return { message: 'Please provide a search query using ?q=' };
+    }
+    return this.actionLogService.searchLogs(query);
+  }
+
+  @Get('pagination')
+  async searchPagination(
+    @Query('q') query: string,
+    @Query('page') page: number,
+    @Query('size') size: number,
+  ): Promise<any> {
+    if (!query) {
+      return { message: 'Please provide a search query using ?q=' };
+    }
+    console.log('page', page);
+    console.log('size', size);
+
+    return this.actionLogService.searchLogsPagination(query, page, size);
+  }
 }
